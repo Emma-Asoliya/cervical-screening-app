@@ -8,6 +8,7 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite:///./app.db"
     jwt_algorithm: str = "HS256"
+    cors_origins: list[str] = ["http://localhost:5173"]
     access_token_minutes: int = 60
 
     max_upload_bytes: int = 5 * 1024 * 1024  # 5 MB

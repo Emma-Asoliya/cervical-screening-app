@@ -1,0 +1,31 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment and secrets
+.env
+
+# Database
+*.db
+*.sqlite3
+
+# Uploaded images and heatmaps (keep the folders, ignore the contents)
+backend/app/storage/uploads/*
+backend/app/storage/heatmaps/*
+!backend/app/storage/uploads/.gitkeep
+!backend/app/storage/heatmaps/.gitkeep
+
+# Model file (large, add later if needed)
+*.keras
+
+# Frontend
+node_modules/
+dist/
+
+# Editor and OS
+.vscode/
+.DS_Store
+Thumbs.db
