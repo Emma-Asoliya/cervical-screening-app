@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { LoaderCircle } from 'lucide-react'
+import Alert from '../components/Alert'
 import PasswordInput from '../components/PasswordInput'
+import TextField from '../components/TextField'
 import { useAuth } from '../auth/AuthContext'
 
-const inputClass =
-  'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600'
 
 function Login() {
-  const { login } = useAuth()
+  const { login, clinician } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -32,47 +33,34 @@ function Login() {
       setSubmitting(false)
     }
   }
+  if(clinician) return <Navigate to={destination} replace />
 
   return (
     <div className="mx-auto max-w-md">
+      <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
+        Clinician workspace
+      </p>
       <h1 className="text-2xl font-bold text-teal-700">Log in</h1>
+      <p className="mt-1 text-slate-600">Access your image screening workspace.</p>
 
       <form
         onSubmit={handleSubmit}
         className="mt-6 space-y-4 rounded-xl border border-teal-100 bg-white p-6 shadow-sm"
       >
-        {notice && (
-          <p
-            role="status"
-            className="rounded-lg border border-teal-300 bg-teal-50 px-3 py-2 text-sm text-teal-900"
-          >
-            {notice}
-          </p>
-        )}
+        {notice && <Alert variant="info" title={notice} />}
+        {error && <Alert variant="error" title={error} />}
 
-        {error && (
-          <p
-            role="alert"
-            className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800"
-          >
-            {error}
-          </p>
-        )}
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-            className={inputClass}
-          />
-        </div>
+        <TextField
+          id="email"
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          placeholder="you@hospital.org"
+          required
+        />
 
         <PasswordInput
           id="password"
@@ -80,22 +68,34 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
+          placeholder="Enter your password"
         />
+
+        {submitting && (
+          <p role="status" className="flex items-center gap-2 text-sm font-medium text-teal-700">
+            <LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin motion-reduce:animate-none" />
+            Logging in…
+          </p>
+        )}
 
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-lg bg-teal-600 px-4 py-2 font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-lg bg-teal-600 px-4 py-2 font-medium text-white hover:bg-teal-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-600"
         >
           {submitting ? 'Logging in…' : 'Log in'}
         </button>
+
+        <p className="text-center text-sm text-slate-600">
+          No account yet?{' '}
+          <Link to="/signup" className="font-medium text-teal-700 underline">
+            Sign up
+          </Link>
+        </p>
       </form>
 
-      <p className="mt-4 text-center text-sm text-slate-600">
-        No account yet?{' '}
-        <Link to="/signup" className="font-medium text-teal-700 underline">
-          Sign up
-        </Link>
+      <p className="mt-4 text-xs text-slate-600">
+        Image decision support only. This is not a patient records system.
       </p>
     </div>
   )

@@ -81,6 +81,9 @@ function Signup() {
                             maxLength={120}
                             className={inputClass}
                         />
+                        <p className="mt-1 text-xs text-slate-600">
+                            Clinician name Only. Do not enter Patient details
+                        </p>
                     </div>
                 
                     <div>
@@ -116,9 +119,10 @@ function Signup() {
 
                         <button
                             type="submit"
+                            disabled={submitting}
                             className="w-full rounded-lg bg-teal-600 px-4 py-2 font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2"
                         >
-                            Create Account
+                            {submitting ? 'Creating account…' : 'Create Account'}
                             </button>
                         </form>
 
