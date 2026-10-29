@@ -27,7 +27,7 @@ def signup(data: SignupRequest, db: Session = Depends(get_db)):
     db.add(clinician)
     db.commit()
     db.refresh(clinician)
-    return Clinician
+    return clinician
 
 @router.post("/login", response_model=TokenResponse)
 def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
