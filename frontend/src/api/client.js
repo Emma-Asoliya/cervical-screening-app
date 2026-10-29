@@ -1,30 +1,38 @@
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
 
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, detail) {
     super(message)
     this.status = status
+    this.detail = detail
   }
 }
 
 async function readErrorMessage(response) {
+  let detail
   try {
     const data = await response.json()
-    if (typeof data.detail === 'string') return data.detail
-    if (Array.isArray(data.detail)) return data.detail.map((d) => d.msg).join(' ')
+    detail = data.detail
   } catch {
-    // The response was not JSON. Fall through to the default message.
+
+    if (typeof detail === 'string') return { message: detail, detail }
+    if (Array.isArray(detail)) return { messgae: detail.map((d) => d.msg).join(' '), detail }
+    if (detail && typeof detail.message === 'string') return { message: detail.message, detail }
+    return 'Something went wrong. Please try again.'
+      // The response was not JSON. Fall through to the default message.
   }
-  return 'Something went wrong. Please try again.'
+  
 }
 
-export async function apiRequest(path, { method = 'GET', token, body, form } = {}) {
+export async function apiRequest(path, { method = 'GET', token, body, form, formData } = {}) {
   const headers = {}
   let payload
 
   if (token) headers.Authorization = `Bearer ${token}`
 
-  if (form) {
+  if (formData) {
+    payload = formData
+  } else if (form) {
     payload = new URLSearchParams(form)
   } else if (body) {
     headers['Content-Type'] = 'application/json'
@@ -39,6 +47,7 @@ export async function apiRequest(path, { method = 'GET', token, body, form } = {
   }
 
   if (!response.ok) {
+    const { message, detail } =await parseError(response)
     throw new ApiError(await readErrorMessage(response), response.status)
   }
   return response.json()
