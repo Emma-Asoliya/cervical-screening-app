@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
@@ -25,3 +26,15 @@ class ClinicianOut(BaseModel):
     full_name: str
     email: EmailStr
     created_at: datetime
+
+class ImageResult(BaseModel):
+    image_id: int
+    predicted_class: Literal["Normal", "Abnormal"]
+    confidence_score: float
+    certainty_level: Literal["High", "Medium", "Low"]
+    explanation: str
+    model_status: str
+    uploaded_at: datetime
+    generated_at: datetime
+    mime_type: str
+    file_size_bytes: int

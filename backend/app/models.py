@@ -52,6 +52,7 @@ class PredictionResult(Base):
     certainty_level: Mapped[str] = mapped_column(String(20))
     explanation: Mapped[str] = mapped_column(Text)
     heatmap_path: Mapped[str] = mapped_column(String(500))
+    model_status: Mapped[str] = mapped_column(String(30))
     generated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     image: Mapped["CervixImage"] = relationship(back_populates="result")

@@ -12,7 +12,7 @@ def get_current_clinician(
         token: str = Depends(oauth2_scheme),
         db: Session = Depends(get_db),
 ) -> Clinician:
-    unauthorized_exception = HTTPException(
+    unauthorized = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid or expired token",
         headers={"WWW-Authenticate": "Bearer"},

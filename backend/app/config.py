@@ -12,7 +12,12 @@ class Settings(BaseSettings):
     access_token_minutes: int = 60
 
     max_upload_bytes: int = 5 * 1024 * 1024  # 5 MB
-    allowed_mime_types: tuple = ("image/jpeg", "image/png")
+    min_image_side: int = 224
+    max_image_pixels: int = 25_000_000
+
+    blur_threshold: float = 100.0
+    brightness_min: float = 50.0
+    brightness_max: float = 205.0
 
     certainty_high: float = 0.85
     certainty_medium: float = 0.65
