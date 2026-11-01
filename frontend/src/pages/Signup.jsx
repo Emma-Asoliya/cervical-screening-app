@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { LoaderCircle } from 'lucide-react'
+import Alert from '../components/Alert'
 import PasswordInput from '../components/PasswordInput'
+import TextField from '../components/TextField'
 import { useAuth } from '../auth/AuthContext'
 
-const inputClass =
-    'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3  py-2 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600'
 
 function Signup() {
     const { clinician, register } = useAuth()
@@ -14,26 +15,34 @@ function Signup() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirm, setConfirm] = useState('')
-    const [error, setError] = useState('')
+    const [error, setErrors] = useState('')
+    const [formError, setFormError] = useState('')
     const [submitting, setSubmitting] = useState(false)
 
+    function change(setter, field) {
+        return (event) => {
+            setter(event.target.value)
+            setErrors((current) => ({ ...current, [field]: undefined }))
+        }
+    }
 
     async function handleSubmit(event) {
         event.preventDefault()
-        setError('')
+        setFormError('')
 
+        const next = {}
         if (password.length < 8) {
-            setError('Password must be at least 8 characters long.')
-            return
-        }
-        if (new TextEncoder().encode(password).length > 72) {
-            setError('Password is too long. (maximum 32 characters).')
-            return
+            next.password = 'Password must be atleast 8 characters long.'
+        } else if (new TextEncoder().encode(password).length > 72) {
+            next.password = 'Password is too long (maximum 32 characters).'
         }
         if (password !== confirm) {
-            setError('Passwords do not match.')
-            return
+            next.confirm = 'Passwords do not match.'
         }
+        setErrors(next)
+        if (Object.keys(next).length > 0) return
+
+
         setSubmitting(true)
         try {
             await register(fullName.trim(), email.trim(), password)
@@ -42,8 +51,12 @@ function Signup() {
             if (err.accountCreated) {
                 navigate('/login', { replace: true, state: { notice: err.message } })
                 return
-            } 
-            setError(err.message)
+            }
+            if (err.status === 409) {
+                setErrors({ email: err.message })
+            } else {
+                setFormError(err.message)
+            }
         } finally {
             setSubmitting(false)
         }
@@ -52,86 +65,92 @@ function Signup() {
 
     return (
         <div className="mx-auto max-w-md">
+            <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
+                Clinician workspace
+            </p>
             <h1 className="text-2xl font-bold text-teal-700"> Create an account</h1>
+            <p className="mt-1 text-slate-600">
+                For Doctors and Nurses using screening Decision Support Tool.
+            </p>
 
-            <form 
-              onSubmit={handleSubmit}
-              className="mt-6 space-y-4 rounded-xl border border-teal-100 bg-white p-6 shadow-sm"
-              >
-                {error && (
-                    <p
-                      role="alert"
-                      className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800"
-                    >
-                        {error}
+            <form
+                onSubmit={handleSubmit}
+                className="mt-6 space-y-4 rounded-xl border border-teal-100 bg-white p-6 shadow-sm"
+            >
+                {formError && <Alert variant="error" title={formError} />}
+
+                <TextField
+                    label="Full Name"
+                    id="full-name"
+                    hint="Clinician name Only. Do not enter Patient details"
+                    value={fullName}
+                    onChange={change(setFullName, 'fullName')}
+                    placeholder="Enter your full name"
+                    autoComplete="name"
+                    required
+                    minLength={2}
+                    maxLength={120}
+                />
+
+                <TextField
+                    id="email"
+                    label="Email"
+                    type="email"
+                    error={errors.email}
+                    value={email}
+                    onChange={change(setEmail, 'email')}
+                    placeholder="you@hospital.org"
+                    autoComplete="email"
+                    required
+                />
+
+                <PasswordInput
+                    id="password"
+                    label="Password"
+                    hint="At least 8 characters."
+                    error={errors.password}
+                    value={password}
+                    onChange={change(setPassword, 'password')}
+                    placeholder="Enter your password"
+                    autoComplete="new-password"
+                />
+
+
+                <PasswordInput
+                    id="confirm-password"
+                    label="Confirm Password"
+                    error={errors.confirm}
+                    value={confirm}
+                    onChange={change(setConfirm, 'confirm')}
+                    placeholder="Enter your password again"
+                    autoComplete="new-password"
+                />
+
+                {submitting && (
+                    <p role="status" className="flex items-center gap-2 text-sm font-medium text-teal-700">
+                        <LoaderCircle
+                            aria-hidden="true"
+                            className="h-4 w-4 animate-spin motion-reduce:animate-none"
+                        />
+                        Creating account…
                     </p>
                 )}
-                <div>
-                    <label htmlFor="full-name" className="block text-sm font-medium text-slate-700">
-                        Full Name
-                        </label>
-                        <input
-                            id="full-name"
-                            type="text"
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
-                            autoComplete="name"
-                            required
-                            minLength={2}
-                            maxLength={120}
-                            className={inputClass}
-                        />
-                        <p className="mt-1 text-xs text-slate-600">
-                            Clinician name Only. Do not enter Patient details
-                        </p>
-                    </div>
-                
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            autoComplete="email"
-                            required
-                            className={inputClass}
-                        />
-                        </div>
 
-                        <PasswordInput
-                            id="password"
-                            label="Password (at least 8 characters)"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            autoComplete="new-password"
-                        />
+                <button
+                    type="submit"
+                    disabled={submitting}
+                    className={`${primaryButton} w-full`}
+                >
+                    {submitting ? 'Creating account…' : 'Create Account'}
+                </button>
 
-                        <PasswordInput
-                            id="confirm-password"
-                            label="Confirm Password"
-                            value={confirm}
-                            onChange={(e) => setConfirm(e.target.value)}
-                            autoComplete="new-password"
-                        />
-
-                        <button
-                            type="submit"
-                            disabled={submitting}
-                            className="w-full rounded-lg bg-teal-600 px-4 py-2 font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2"
-                        >
-                            {submitting ? 'Creating account…' : 'Create Account'}
-                            </button>
-                        </form>
-
-                        <p className="mt-4 text-center text-sm text-slate-600">
-                            Already have an account?{' '}
-                            <Link to="/login" className="font-medium text-teal-700 underline">
-                                Log In
-                            </Link>
-                        </p>
+                <p className="mt-4 text-center text-sm text-slate-600">
+                    Already have an account?{' '}
+                    <Link to="/login" className="font-medium text-teal-700 underline">
+                        Log In
+                    </Link>
+                </p>
+            </form>
         </div>
     )
 }

@@ -16,11 +16,12 @@ export function useProtectedImage(imageId, kind) {
         apiBlob(`/images/${imageId}/${kind}`, { token, signal: controller.signal })
             .then((blob) => {
                 if (cancelled) return
-                objectUrl = URL.createdObjectURL(blob)
+                objectUrl = URL.createObjectURL(blob)
                 setState({ url: objectUrl, status: 'ready' })
             })
             .catch((error) => {
                 if (cancelled || error.name === 'AbortError') return
+                console.error('Image failed to load:', error)
                 setState({ url: null, status: 'error' })
             })
         return () => {
