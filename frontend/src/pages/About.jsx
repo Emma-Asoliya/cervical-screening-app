@@ -15,6 +15,7 @@ ArrowRight,
 import Alert from '../components/Alert'
 import ResultBadge from '../components/ResultBadge'
 import { cardClass, secondaryButton } from '../components/ui'
+import { useAuth } from '../auth/AuthContext'
 
 const MODEL_IS_PLACEHOLDER = true
 
@@ -31,6 +32,7 @@ function InfoItem({ icon: Icon, title, children }) {
 }
 
 function About() {
+    const { clinician } = useAuth()
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
@@ -140,14 +142,22 @@ function About() {
               local clinical guidance.
             </InfoItem>
           </ul>
+          {clinician ? (
           <Link to="/dashboard" className={`${secondaryButton} mt-5`}>
             Go to Dashboard
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
           </Link>
-        </section>
-      </div>
+          ) : (
+            <Link to="/login" className={`${secondaryButton} mt-5`}>
+            Log in
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </Link>
+          )}
+
+          </section>
+        </div>
     </div>
-  )
+    )
 }
 
 export default About

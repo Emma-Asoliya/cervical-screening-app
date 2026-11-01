@@ -8,21 +8,20 @@ export class ApiError extends Error {
   }
 }
 
-async function readErrorMessage(response) {
+async function parseError(response) {
   let detail
   try {
     const data = await response.json()
     detail = data.detail
   } catch {
 
+  }
     if (typeof detail === 'string') return { message: detail, detail }
-    if (Array.isArray(detail)) return { messgae: detail.map((d) => d.msg).join(' '), detail }
+    if (Array.isArray(detail)) return { message: detail.map((d) => d.msg).join(' '), detail }
     if (detail && typeof detail.message === 'string') return { message: detail.message, detail }
-    return 'Something went wrong. Please try again.'
-      // The response was not JSON. Fall through to the default message.
+    return { message: 'Something went wrong. Please try again.', detail }      // The response was not JSON. Fall through to the default message.
   }
   
-}
 
 export async function apiRequest(path, { method = 'GET', token, body, form, formData } = {}) {
   const headers = {}
@@ -48,7 +47,26 @@ export async function apiRequest(path, { method = 'GET', token, body, form, form
 
   if (!response.ok) {
     const { message, detail } =await parseError(response)
-    throw new ApiError(await readErrorMessage(response), response.status)
+    throw new ApiError(message, response.status, detail)
   }
   return response.json()
+}
+
+export async function apiBlob(path, {token, signal} = {}) {
+  const headers = {}
+  if (token) headers.Authorization = `Bearer ${token}`
+
+  let response
+  try {
+    response = await fetch(`${API_URL}${path}`, { headers, signal })
+  } catch {
+    if (error.name === 'AbortError') throw error
+    throw new ApiError('Unable to reach the server. Check your connection and try again.', 0)
+  }
+
+  if (!response.ok) {
+    const { message, detail } = await parseError(response)
+    throw new ApiError(message, response.status, detail)
+  }
+  return response.blob()
 }

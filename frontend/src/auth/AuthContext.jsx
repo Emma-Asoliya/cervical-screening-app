@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { apiRequest, ApiError } from '../api/client'
 
 const TOKEN_KEY = 'access_token'
@@ -88,11 +88,11 @@ export function AuthProvider({ children }) {
     }
   }
 
-  function logout() {
+  const logout = useCallback(() => {
     clearToken()
     setToken(null)
     setClinician(null)
-  }
+  }, [])
 
   return (
     <AuthContext.Provider value={{ token, clinician, loading, login, register,logout }}>

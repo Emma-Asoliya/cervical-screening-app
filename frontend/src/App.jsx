@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import RequireAuth from './auth/RequireAuth'
 import Login from './pages/Login'
@@ -8,12 +8,13 @@ import Result from './pages/Result'
 import History from './pages/History'
 import About from './pages/About'
 import NotFound from './pages/NotFound'
+import HomeRedirect from './auth/HomeRedirect'
 
 function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<HomeRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
