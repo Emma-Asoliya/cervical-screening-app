@@ -4,7 +4,7 @@ A web application that helps clinicians screen for cervical abnormalities. A cli
 
 > **Research prototype. Not validated for clinical use.** It supports a clinician's judgement and does not replace it.
 
-**Walkthrough video:** https://drive.google.com/file/d/1W0Hsf2Nt7fGXdQC-UT6yxeDcdlsYiKBB/view?usp=sharing
+**Walkthrough video:** (https://drive.google.com/file/d/1lycRO-QlOp_6HDltGa_v7vTbSp0mIW2R/view?usp=drive_link)
 **Technical report (PDF):** (https://docs.google.com/document/d/1KJ3K7myERDxkcC_M4ShHGrf7SKvR0zZDEKP1XWluX84/edit?usp=sharing)
 **Author:** Emmanuella Briggs, capstone project
 
