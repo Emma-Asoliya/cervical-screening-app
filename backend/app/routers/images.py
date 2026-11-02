@@ -119,6 +119,9 @@ def upload_image(
         image_path = storage.save_bytes("uploads", extension, clean_bytes)
         saved.append(image_path)
 
+        analysis = run_analysis(storage.resolve(image_path))
+        saved.append(analysis.heatmap_path)
+
         record = CervixImage(
             clinician_id=current.clinician_id,
             file_name=Path(image_path).name,
@@ -128,10 +131,6 @@ def upload_image(
         )
         db.add(record)
         db.flush()
-
-        analysis = run_analysis(storage.resolve(image_path))
-        saved.append(analysis.heatmap_path)
-
         db.add(
             PredictionResult(
                 image_id=record.image_id,
