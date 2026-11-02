@@ -14,7 +14,12 @@ from app.models import CervixImage, Clinician, PredictionResult
 from app.schemas import ImageResult
 from app.services import storage
 from app.services.analysis import PredictionError, run_analysis
-from app.services.images import InvalidImageError, encode_clean, load_image
+from app.services.images import (
+    InvalidImageError,
+    encode_clean,
+    load_image,
+    require_model_input_size,
+)
 from app.services.quality import check_quality
 
 logger = logging.getLogger(__name__)
@@ -92,6 +97,7 @@ def upload_image(
 
     try:
         image, mime_type = load_image(contents)
+        require_model_input_size(image)
     except InvalidImageError as exc:
         raise HTTPException(422, str(exc)) from None
 

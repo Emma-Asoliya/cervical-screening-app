@@ -38,6 +38,15 @@ def load_image(contents: bytes) -> tuple[Image.Image, str]:
 
     return image, FORMAT_TO_MIME[image_format]
 
+def require_model_input_size(image: Image.Image) -> None:
+    """The model only understands photos of the size it was trained on."""
+    want = (settings.required_image_width, settings.required_image_height)
+    if image.size != want:
+        raise InvalidImageError(
+            f"This model needs a {want[0]} x {want[1]} pixel colposcopy photo taken after "
+            f"acetic acid. This image is {image.size[0]} x {image.size[1]} pixels."
+        )
+
 def encode_clean(image: Image.Image, mime_type: str) -> tuple[bytes, str]:
     buffer = BytesIO()
     if mime_type == "image/jpeg":

@@ -4,6 +4,7 @@ import { LoaderCircle } from 'lucide-react'
 import Alert from '../components/Alert'
 import PasswordInput from '../components/PasswordInput'
 import TextField from '../components/TextField'
+import { primaryButton } from '../components/ui'
 import { useAuth } from '../auth/AuthContext'
 
 
@@ -15,7 +16,7 @@ function Signup() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirm, setConfirm] = useState('')
-    const [error, setErrors] = useState('')
+    const [errors, setErrors] = useState('')
     const [formError, setFormError] = useState('')
     const [submitting, setSubmitting] = useState(false)
 

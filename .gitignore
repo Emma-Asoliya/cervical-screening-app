@@ -18,8 +18,10 @@ backend/app/storage/heatmaps/*
 !backend/app/storage/uploads/.gitkeep
 !backend/app/storage/heatmaps/.gitkeep
 
-# Model file (large, add later if needed)
+# Model files. The five fold models are small (~0.3 MB each) and the app needs them,
+# so the ones in backend/app/ml_models are kept. Any other .keras file stays ignored.
 *.keras
+!backend/app/ml_models/*.keras
 
 # Frontend
 node_modules/

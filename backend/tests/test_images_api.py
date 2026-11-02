@@ -3,13 +3,13 @@ from io import BytesIO
 import numpy as np
 from PIL import Image, ImageFilter
 
-from app.config import settings
+from backend.app.ml_models.config import settings
 from app.services import predictor
 
 
 def make_jpeg(seed=0, blur=0):
     rng = np.random.default_rng(seed)
-    image = Image.fromarray(rng.integers(0, 256, (400, 400, 3), dtype=np.uint8))
+    image = Image.fromarray(rng.integers(0, 256, (480, 640, 3), dtype=np.uint8))
     if blur:
         image = image.filter(ImageFilter.GaussianBlur(blur))
     buffer = BytesIO()
@@ -45,7 +45,8 @@ def test_upload_returns_a_result(client):
     assert response.status_code == 201
     body = response.json()
     assert body["predicted_class"] in ("Normal", "Abnormal")
-    assert body["model_status"] == "placeholder"
+    assert body["model_status"] == "research_prototype"
+    assert "not validated for clinical use" in body["explanation"]
     assert "file_path" not in body
     assert "file_name" not in body
     assert "heatmap_path" not in body
@@ -56,6 +57,17 @@ def test_rejects_a_file_that_is_not_an_image(client):
     response = upload(client, headers, b"just some text", filename="notes.jpg")
     assert response.status_code == 422
     assert isinstance(response.json()["detail"], str)
+
+
+def test_rejects_a_photo_that_is_not_640_by_480(client):
+    headers = login_headers(client)
+    wrong = Image.fromarray(np.zeros((300, 400, 3), dtype=np.uint8))
+    buffer = BytesIO()
+    wrong.save(buffer, format="JPEG")
+    response = upload(client, headers, buffer.getvalue())
+    assert response.status_code == 422
+    assert "640 x 480" in response.json()["detail"]
+    assert client.get("/images", headers=headers).json() == []
 
 
 def test_rejects_a_file_over_the_size_limit(client, monkeypatch):
