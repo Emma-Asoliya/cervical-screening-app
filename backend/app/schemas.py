@@ -6,13 +6,13 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 class SignupRequest(BaseModel):
     full_name: str = Field(min_length=2, max_length=90)
     email: EmailStr
-    password: str = Field(min_length=8, max_length=32)
+    password: str = Field(min_length=8, max_length=72)
 
     @field_validator("password")
     @classmethod
     def password_fits_bcrypt(cls, value: str) -> str:
-        if len(value.encode("utf-8")) > 32:
-            raise ValueError("Password is too long (max 32 bytes)")
+        if len(value.encode("utf-8")) > 72:
+            raise ValueError("Password is too long (max 72 bytes)")
         return value
 
 class TokenResponse(BaseModel):

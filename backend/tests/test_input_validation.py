@@ -56,6 +56,7 @@ def upload(client, auth, data, filename="photo.jpg", content_type="image/jpeg", 
         ("grayscale JPEG", encode(noise(mode="L"), "JPEG"), "gray.jpg", "image/jpeg"),
         ("PNG with transparency", encode(noise(mode="RGBA"), "PNG"), "alpha.png", "image/png"),
     ],
+    ids=["JPEG", "PNG", "grayscale JPEG", "PNG with transparency"],
 )
 def test_valid_photos_are_analysed(client, label, data, filename, content_type):
     response = upload(client, headers(client), data, filename, content_type)

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from backend.app.ml_models.config import settings
+from app.config import settings
 from app.services import predictor, storage
 from app.services.analysis import PredictionError, run_analysis
 

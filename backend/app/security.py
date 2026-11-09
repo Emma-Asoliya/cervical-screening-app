@@ -11,7 +11,7 @@ def hash_password(password: str) -> str:
 
 def verify_password(password: str, password_hash: str) -> bool:
     password_bytes = password.encode("utf-8")
-    if len(password_bytes) > 32:
+    if len(password_bytes) > 72:
         return False
     return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
 
@@ -25,7 +25,7 @@ def decode_access_token(token: str) -> int | None:
     """Return the clinician id if the token is valid and not expired, else None"""
     try:
         payload = jwt.decode(
-            token, settings.secret_key, algorithms=[settings.jwt_algorithm]
+            token, settings.secret_key, algorithms=[settings.jwt_algorithm], options={"require": ["exp", "sub"]},
         )
         return int(payload["sub"])
     except (jwt.PyJWTError, KeyError, ValueError):

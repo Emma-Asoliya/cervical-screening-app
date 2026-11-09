@@ -3,7 +3,7 @@ from io import BytesIO
 import numpy as np
 from PIL import Image, ImageFilter
 
-from backend.app.ml_models.config import settings
+from app.config import settings
 from app.services import predictor
 
 

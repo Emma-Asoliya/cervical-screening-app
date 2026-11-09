@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from backend.app.ml_models.config import settings
+from app.config import settings
 from app.database import Base, get_db
 from app.main import app
 from app.services import predictor, storage

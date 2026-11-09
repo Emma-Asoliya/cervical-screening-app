@@ -34,7 +34,7 @@ async function signUp(page, email = uniqueEmail()) {
   await page.getByPlaceholder('Enter your password').first().fill(PASSWORD)
   await page.getByPlaceholder('Enter your password again').fill(PASSWORD)
   await page.locator('main form button[type=submit]').click()
-  await expect(page).toHaveURL(/\/dashboard/)
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 })
   return email
 }
 

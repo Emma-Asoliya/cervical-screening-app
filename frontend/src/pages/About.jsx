@@ -66,14 +66,6 @@ function About() {
               Do not upload patient details or images containing identifying labels.
             </InfoItem>
           </ul>
-          {MODEL_IS_PLACEHOLDER && (
-            <div className="mt-4">
-              <Alert variant="warning" title="Placeholder outputs only">
-                The model is not connected yet. Example results must not be used for patient
-                care.
-              </Alert>
-            </div>
-          )}
         </section>
 
         <section className={cardClass}>
