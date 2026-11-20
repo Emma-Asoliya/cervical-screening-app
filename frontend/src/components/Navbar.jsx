@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { CircleUser, Menu, X } from 'lucide-react'
+import { LogOut, Menu, X } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
+import Logo from './Logo'
+import ThemeToggle from './ThemeToggle'
+
 
 const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visble:ring-white'
 const baseLink = `rounded px-3 py-2 text-sm font-medium ${focusRing}`
@@ -19,8 +22,17 @@ const loggedOutLinks = [
 
 function linkClass(block) {
     return ({ isActive }) =>
-        `${baseLink} ${block ? 'block' : ''} ${isActive ? 'bg-teal-800 underline underline-offset-4' : 'hover:bg-teal-600'
+        `${baseLink} ${block ? 'block' : ''} ${isActive ? 'bg-brand-soft text-accent' : 'text-muted hover:bg-brand-soft hover:text-ink'
         }`
+}
+
+function initials(name) {
+    return name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0].toUpperCase())
+        .join('')
 }
 
 function Navbar() {
@@ -67,8 +79,10 @@ function Navbar() {
                     <button
                         type="button"
                         onClick={handleLogout}
-                        className={`${baseLink} hover:bg-teal-600 ${block ? 'block w-full text-left' : ''}`}
+                        className={`${baseLink} inline-flex items-center gap-1.5 text-muted hover:bg-brand-soft hover:text-ink ${block ? 'flex w-full' : ''
+                            }`}
                     >
+                        <LogOut aria-hidden="true" className="h-4 w-4" />
                         Log out
                     </button>
                 )}
@@ -76,40 +90,54 @@ function Navbar() {
         )
     }
 
+    const brand = (
+        <span className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-ink">
+            <Logo className="h-8 w-8" />
+            Cervical Screening Support
+        </span>
+    )
+
     return (
-        <header className="bg-teal-700 text-white">
+        <header className="sticky top-0 z-20 border-b border-line bg-surface/85 backdrop-blur print:hidden">
             <nav aria-label="Main" className="mx-auto max-w-5xl px-4 py-3">
                 <div className="flex items-center justify-between gap-2">
                     {clinician ? (
-                        <Link to="/dashboard" className={`rounded text-lg font-bold ${focusRing}`}>
-                            Cervical Screening Support
+                        <Link to="/dashboard" className={`rounded-lg ${focusRing}`}>
+                            {brand}
                         </Link>
                     ) : (
-                        <span className="text-lg font-bold">Cervical Screening Support</span>
+                        brand
                     )}
 
-                    {ready && (
-                        <>
+                    <div className="flex items-center gap-2">
+                        {ready && (
                             <div className="hidden items-center gap-1 md:flex">
                                 {renderItems(false)}
                                 {clinician && (
                                     <span
-                                        className="ml-2 flex max-w-48 items-center gap-1 truncate text-sm"
+                                        className="ml-2 flex max-w-48 items-center gap-2 truncate text-sm text-ink"
                                         title={clinician.full_name}
                                     >
-                                        <CircleUser aria-hidden="true" className="h-4 w-4 shrink-0" />
+                                        <span
+                                            aria-hidden="true"
+                                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-on-brand"
+                                        >
+                                            {initials(clinician.full_name)}
+                                        </span>
                                         <span className="truncate">{clinician.full_name}</span>
                                     </span>
                                 )}
                             </div>
-
+                        )}
+                        <ThemeToggle />
+                        {ready && (
                             <button
                                 ref={menuButton}
                                 type="button"
                                 onClick={() => setOpen(!open)}
                                 aria-expanded={open}
                                 aria-controls="mobile-menu"
-                                className={`inline-flex items-center gap-2 rounded border border-white/40 px-3 py-2 text-sm font-medium hover:bg-teal-600 md:hidden ${focusRing}`}
+                                className={`inline-flex items-center gap-2 rounded-xl border border-line px-3 py-2 text-sm font-medium text-ink hover:bg-brand-soft md:hidden ${focusRing}`}
                             >
                                 {open ? (
                                     <X aria-hidden="true" className="h-4 w-4" />
@@ -118,14 +146,14 @@ function Navbar() {
                                 )}
                                 Menu
                             </button>
-                        </>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 {ready && open && (
-                    <div id="mobile-menu" className="mt-3 space-y-1 border-t border-teal-600 pt-3 md:hidden">
+                    <div id="mobile-menu" className="mt-3 space-y-1 border-t border-line pt-3 md:hidden">
                         {clinician && (
-                            <p className="px-3 pb-1 text-sm">
+                            <p className="px-3 pb-1 text-sm text-ink">
                                 Signed in as <span className="font-semibold">{clinician.full_name}</span>
                             </p>
                         )}

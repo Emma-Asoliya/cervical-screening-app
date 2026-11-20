@@ -6,7 +6,7 @@ function HomeRedirect() {
 
     if (loading) {
         return (
-            <p role="status" className="text-slate-600">
+            <p role="status" className="text-muted">
                 Loading...
             </p>
         )

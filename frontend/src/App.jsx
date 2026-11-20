@@ -9,6 +9,8 @@ import History from './pages/History'
 import About from './pages/About'
 import NotFound from './pages/NotFound'
 import HomeRedirect from './auth/HomeRedirect'
+import Verify from './pages/Verify'
+import Privacy from './pages/Privacy'
 
 function App() {
   return (
@@ -17,7 +19,9 @@ function App() {
         <Route path="/" element={<HomeRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/verify" element={<Verify />} />
         <Route path="about" element={<About />} />
+        <Route path="privacy" element={<Privacy />} />
 
         <Route element={<RequireAuth />}>
           <Route path="/dashboard" element={<Dashboard />} />

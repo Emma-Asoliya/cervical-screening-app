@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Camera,
+  CircleCheck,
   FileImage,
   FolderOpen,
   Lightbulb,
@@ -11,7 +12,8 @@ import {
   Upload,
 } from 'lucide-react'
 import Alert from '../components/Alert'
-import { cardClass, ghostButton, primaryButton, secondaryButton } from '../components/ui'
+import Stepper from '../components/Stepper'
+import { cardClass, eyebrow, ghostButton, pageTitle, primaryButton, secondaryButton } from '../components/ui'
 import { useAuth } from '../auth/AuthContext'
 import { apiRequest } from '../api/client'
 
@@ -174,18 +176,21 @@ function Dashboard() {
   }
 
   const quality = warning ? qualityText(warning.issues) : null
+  const step = analysing ? 1 : file ? 1 : 0
 
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
-        Screening workspace
-      </p>
-      <h1 className="mt-1 text-2xl font-bold text-teal-700">Upload image</h1>
-      <p className="mt-1 text-slate-600">Choose one colposcopy image for model-assisted review.</p>
+      <p className={eyebrow}>Screening workspace</p>
+      <h1 className={pageTitle}>Upload image</h1>
+      <p className="mt-1 text-muted">Choose one colposcopy image for model-assisted review.</p>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="mt-5">
+        <Stepper steps={['Choose image', 'Analyse', 'Review result']} current={step} />
+      </div>
+
+      <div className="mt-6 grid gap-5 lg:grid-cols-3">
         <section className={`${cardClass} lg:col-span-2`} aria-labelledby="choose-heading">
-          <h2 id="choose-heading" className="text-sm font-semibold text-slate-800">
+          <h2 id="choose-heading" className="text-sm font-semibold text-ink">
             Choose an image
           </h2>
 
@@ -210,25 +215,25 @@ function Dashboard() {
               onDragOver={handleDragOver}
               onDragLeave={() => setDragging(false)}
               onDrop={handleDrop}
-              className={`mt-3 rounded-lg border-2 border-dashed p-8 text-center ${
-                dragging ? 'border-teal-600 bg-teal-100' : 'border-teal-300 bg-teal-50'
+              className={`mt-3 rounded-2xl border-2 border-dashed p-10 text-center transition-colors ${
+                dragging ? 'border-brand bg-brand-soft' : 'border-line bg-surface-2'
               }`}
             >
-              <Upload aria-hidden="true" className="mx-auto h-6 w-6 text-teal-700" />
-              <p className="mt-3 font-medium text-slate-800">
-                Drag an image here or choose a file
-              </p>
-              <p className="mt-1 text-sm text-slate-600">
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-soft text-accent">
+                <Upload aria-hidden="true" className="h-6 w-6" />
+              </span>
+              <p className="mt-4 font-semibold text-ink">Drag an image here or choose a file</p>
+              <p className="mt-1 text-sm text-muted">
                 JPEG or PNG, up to 5 MB. One image at a time.
               </p>
-              <button type="button" onClick={openPicker} className={`${secondaryButton} mt-4`}>
+              <button type="button" onClick={openPicker} className={`${secondaryButton} mt-5`}>
                 <FolderOpen aria-hidden="true" className="h-4 w-4" />
                 Choose a file
               </button>
             </div>
           ) : (
             <div className="mt-3">
-              <div className="flex max-h-80 items-center justify-center overflow-hidden rounded-lg bg-slate-100">
+              <div className="flex max-h-80 items-center justify-center overflow-hidden rounded-2xl bg-surface-2">
                 {previewUrl && (
                   <img
                     src={previewUrl}
@@ -238,10 +243,10 @@ function Dashboard() {
                 )}
               </div>
               <div className="mt-3 flex items-start gap-2">
-                <FileImage aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-teal-700" />
+                <FileImage aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                 <div className="min-w-0">
-                  <p className="break-all font-medium text-slate-800">{file.name}</p>
-                  <p className="text-sm text-slate-600">
+                  <p className="break-all font-medium text-ink">{file.name}</p>
+                  <p className="text-sm text-muted">
                     {typeLabel(file.type)} · {formatSize(file.size)} · One image
                   </p>
                 </div>
@@ -254,11 +259,11 @@ function Dashboard() {
               <div role="status" className="flex items-start gap-2">
                 <LoaderCircle
                   aria-hidden="true"
-                  className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-teal-700 motion-reduce:animate-none"
+                  className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-accent motion-reduce:animate-none"
                 />
                 <div>
-                  <p className="font-medium text-teal-700">Analysing image…</p>
-                  <p className="text-sm text-slate-600">
+                  <p className="font-medium text-accent">Analysing image…</p>
+                  <p className="text-sm text-muted">
                     Please keep this page open while the image is reviewed.
                   </p>
                 </div>
@@ -309,7 +314,7 @@ function Dashboard() {
             )}
 
             {serverDown && file && (
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-muted">
                 Your selected image is still here. Try Analyse image again when the connection
                 is available.
               </p>
@@ -318,16 +323,24 @@ function Dashboard() {
         </section>
 
         <aside className="space-y-4">
-          <section className="rounded-xl border border-teal-100 bg-white p-4 shadow-sm">
-            <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-              <Lightbulb aria-hidden="true" className="h-4 w-4 text-teal-700" />
-              Before you upload
+          <section className="rounded-2xl border border-line bg-surface p-5 shadow-card">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+              <Lightbulb aria-hidden="true" className="h-4 w-4 text-accent" />
+              Photo requirements
             </h2>
-            <p className="mt-2 text-slate-800">Use a well-lit, in-focus image of the cervix.</p>
-            <p className="mt-1 text-sm text-slate-600">
-              Avoid shadows and glare. Centre the cervix and check focus before choosing your
-              image.
-            </p>
+            <ul className="mt-3 space-y-2.5 text-sm text-muted">
+              {[
+                'After-acid colposcopy photo, 640 × 480 pixels',
+                'JPEG or PNG, up to 5 MB',
+                'Well lit and in focus, cervix centred',
+                'No shadows, glare, names or labels',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2">
+                  <CircleCheck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </section>
 
           <Alert variant="info" title="No patient information">

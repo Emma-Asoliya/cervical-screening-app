@@ -71,11 +71,18 @@ export function AuthProvider({ children }) {
     setToken(data.access_token)
   }
 
+  function acceptToken(accessToken) {
+    saveToken(accessToken)
+    setLoading(true)
+    setToken(accessToken)
+  }
+
   async function register(fullName, email, password) {
-    await apiRequest('/auth/signup', {
+    const created = await apiRequest('/auth/signup', {
       method: 'POST',
       body: { full_name: fullName, email, password },
     })
+    if (created.email_verified === false) return { needsVerification: true }
     try {
       await login(email, password)
     } catch {
@@ -86,16 +93,21 @@ export function AuthProvider({ children }) {
       error.accountCreated = true
       throw error
     }
+    return { needsVerification: false }
   }
 
-  const logout = useCallback(() => {
+
+
+    const logout = useCallback(() => {
     clearToken()
     setToken(null)
     setClinician(null)
   }, [])
 
   return (
-    <AuthContext.Provider value={{ token, clinician, loading, login, register,logout }}>
+    <AuthContext.Provider
+      value={{ token, clinician, loading, login, register, acceptToken, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )

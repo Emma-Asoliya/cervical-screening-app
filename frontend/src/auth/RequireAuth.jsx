@@ -6,7 +6,7 @@ function RequireAuth() {
     const location = useLocation()
 
     if (loading) {
-        return <p role="status" className="text-slate-600">Loading...</p>
+        return <p role="status" className="text-muted">Loading...</p>
     }
 
     if (!clinician) {

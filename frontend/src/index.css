@@ -1,7 +1,95 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens. Components use these names, so light and dark mode need no per-component work. */
+:root {
+  --bg: #eef5f4;
+  --surface: #ffffff;
+  --surface-2: #f5faf9;
+  --line: #d6e4e1;
+  --ink: #0f2327;
+  --muted: #4a6168;
+  --brand: #0f766e;
+  --brand-strong: #0b5d57;
+  --on-brand: #ffffff;
+  --accent: #0f766e;
+  --brand-soft: #dff2ee;
+  --warn: #92400e;
+  --warn-soft: #fef3e0;
+  --warn-line: #efc98a;
+  --danger: #b91c1c;
+  --danger-soft: #fdecec;
+  --danger-line: #f1b0b0;
+  --glow: rgba(15, 118, 110, 0.12);
+}
+
+.dark {
+  --bg: #0a1416;
+  --surface: #111f22;
+  --surface-2: #162a2e;
+  --line: #24393d;
+  --ink: #e8f2f1;
+  --muted: #9fb7bb;
+  --brand: #2bb8a8;
+  --brand-strong: #4fd1c2;
+  --on-brand: #031a18;
+  --accent: #5eead4;
+  --brand-soft: #14312f;
+  --warn: #fbbf77;
+  --warn-soft: #2b2010;
+  --warn-line: #5c4318;
+  --danger: #fca5a5;
+  --danger-soft: #2d1416;
+  --danger-line: #6b2a2d;
+  --glow: rgba(45, 212, 191, 0.10);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-on-brand: var(--on-brand);
+  --color-accent: var(--accent);
+  --color-brand-soft: var(--brand-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-line: var(--warn-line);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-line: var(--danger-line);
+  --shadow-card: 0 1px 2px rgba(15, 35, 39, 0.05), 0 8px 24px -12px rgba(15, 35, 39, 0.18);
+}
+
 @layer base {
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
   body {
-    @apply bg-teal-50 text-slate-800 antialiased;
+    @apply bg-bg text-ink antialiased;
+    background-image: radial-gradient(60rem 28rem at 85% -8rem, var(--glow), transparent 70%);
+    background-repeat: no-repeat;
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  h1, h2, h3 {
+    letter-spacing: -0.015em;
+  }
+  ::selection {
+    background: var(--brand-soft);
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
   }
 }

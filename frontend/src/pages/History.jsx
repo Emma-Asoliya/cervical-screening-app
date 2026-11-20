@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   ArrowRight,
   History as HistoryIcon,
@@ -11,7 +11,7 @@ import {
 import Alert from '../components/Alert'
 import ProtectedImage from '../components/ProtectedImage'
 import ResultBadge from '../components/ResultBadge'
-import { cardClass, primaryButton, secondaryButton } from '../components/ui'
+import { cardClass, eyebrow, pageTitle, primaryButton, secondaryButton } from '../components/ui'
 import { useAuth } from '../auth/AuthContext'
 import { apiRequest } from '../api/client'
 import { formatDateTime } from '../lib/format'
@@ -22,6 +22,8 @@ const ROW_GRID = 'md:grid-cols-[4rem_9rem_1fr_13rem_6rem]'
 function History() {
   const { token, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [filter, setFilter] = useState('All')
 
   const [items, setItems] = useState([])
   const [status, setStatus] = useState('loading')
@@ -87,17 +89,21 @@ function History() {
     }
   }
 
+  const counts = {
+    All: items.length,
+    Normal: items.filter((row) => row.predicted_class === 'Normal').length,
+    Abnormal: items.filter((row) => row.predicted_class === 'Abnormal').length,
+  }
+  const visible = filter === 'All' ? items : items.filter((row) => row.predicted_class === filter)
   const hasPlaceholder = items.some((row) => row.model_status === 'placeholder')
 
   return (
     <div>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
-            Screening workspace
-          </p>
-          <h1 className="mt-1 text-2xl font-bold text-teal-700">History</h1>
-          <p className="mt-1 text-slate-600">
+          <p className={eyebrow}>Screening workspace</p>
+          <h1 className={pageTitle}>History</h1>
+          <p className="mt-1 text-muted">
             Review previous image classifications. No patient information is stored here.
           </p>
         </div>
@@ -106,6 +112,12 @@ function History() {
           Upload image
         </Link>
       </div>
+
+      {location.state?.notice && (
+        <div className="mt-6">
+          <Alert variant="info" title={location.state.notice} />
+        </div>
+      )}
 
       {hasPlaceholder && (
         <div className="mt-6">
@@ -117,7 +129,7 @@ function History() {
 
       {status === 'loading' && (
         <section className={`${cardClass} mt-6`} aria-busy="true">
-          <p role="status" className="flex items-center gap-2 font-medium text-teal-700">
+          <p role="status" className="flex items-center gap-2 font-medium text-accent">
             <LoaderCircle
               aria-hidden="true"
               className="h-4 w-4 animate-spin motion-reduce:animate-none"
@@ -125,15 +137,15 @@ function History() {
             Loading history…
           </p>
           <div
-            className="mt-4 animate-pulse divide-y divide-teal-100 motion-reduce:animate-none"
+            className="mt-4 animate-pulse divide-y divide-line motion-reduce:animate-none"
             aria-hidden="true"
           >
             {[0, 1, 2].map((n) => (
               <div key={n} className="flex items-center gap-4 py-4">
-                <div className="h-16 w-16 rounded-lg bg-slate-200" />
+                <div className="h-16 w-16 rounded-lg bg-line" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-3 w-1/3 rounded bg-slate-200" />
-                  <div className="h-3 w-1/4 rounded bg-slate-100" />
+                  <div className="h-3 w-1/3 rounded bg-line" />
+                  <div className="h-3 w-1/4 rounded bg-surface-2" />
                 </div>
               </div>
             ))}
@@ -157,13 +169,13 @@ function History() {
 
       {status === 'ready' && items.length === 0 && (
         <section className={`${cardClass} mt-6 text-center`}>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-teal-50">
-            <HistoryIcon aria-hidden="true" className="h-6 w-6 text-teal-700" />
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-soft">
+            <HistoryIcon aria-hidden="true" className="h-6 w-6 text-accent" />
           </div>
-          <p className="mt-3 font-semibold text-slate-800">
+          <p className="mt-3 font-semibold text-ink">
             No images yet. Upload your first image.
           </p>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-muted">
             Image reviews will appear here after an upload.
           </p>
           <Link to="/dashboard" className={`${primaryButton} mt-4`}>
@@ -175,18 +187,36 @@ function History() {
 
       {status === 'ready' && items.length > 0 && (
         <>
-          <p className="mt-6 text-sm text-slate-600">
+          <div role="group" aria-label="Filter by classification" className="mt-6 flex flex-wrap gap-2">
+            {['All', 'Normal', 'Abnormal'].map((name) => (
+              <button
+                key={name}
+                type="button"
+                aria-pressed={filter === name}
+                onClick={() => setFilter(name)}
+                className={`rounded-full border px-3.5 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                  filter === name
+                    ? 'border-brand bg-brand text-on-brand'
+                    : 'border-line bg-surface text-muted hover:text-ink'
+                }`}
+              >
+                {name} <span className="opacity-80">({counts[name]})</span>
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-4 text-sm text-muted">
             {hasMore
               ? `Showing the latest ${items.length} image reviews`
               : `${items.length} image ${items.length === 1 ? 'review' : 'reviews'}`}
           </p>
 
           <section
-            className="mt-2 overflow-hidden rounded-xl border border-teal-100 bg-white shadow-sm"
+            className="mt-2 overflow-hidden rounded-2xl border border-line bg-surface shadow-card"
             aria-label="Image reviews"
           >
             <div
-              className={`hidden gap-4 border-b border-teal-100 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 md:grid ${ROW_GRID}`}
+              className={`hidden gap-4 border-b border-line bg-surface-2 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-muted md:grid ${ROW_GRID}`}
               aria-hidden="true"
             >
               <span>Image</span>
@@ -196,8 +226,11 @@ function History() {
               <span>Action</span>
             </div>
 
-            <ul className="divide-y divide-teal-100">
-              {items.map((row) => {
+            {visible.length === 0 && (
+              <p className="p-6 text-center text-sm text-muted">No {filter.toLowerCase()} results in this list.</p>
+            )}
+            <ul className="divide-y divide-line">
+              {visible.map((row) => {
                 const percent = Math.min(100, Math.max(0, Math.round(row.confidence_score * 100)))
                 const when = formatDateTime(row.generated_at)
                 return (
@@ -218,19 +251,19 @@ function History() {
                     </div>
 
                     <div>
-                      <p className="font-semibold text-slate-800">
+                      <p className="font-semibold text-ink">
                         {row.certainty_level} certainty
                       </p>
-                      <p className="text-sm text-slate-600">{percent}% model confidence</p>
+                      <p className="text-sm text-muted">{percent}% model confidence</p>
                       {row.model_status === 'placeholder' && (
-                        <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-amber-900">
+                        <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-warn">
                           <TriangleAlert aria-hidden="true" className="h-3 w-3 shrink-0" />
                           Placeholder result
                         </p>
                       )}
                     </div>
 
-                    <p className="text-sm text-slate-700">{when}</p>
+                    <p className="text-sm text-ink">{when}</p>
 
                     <Link
                       to={`/results/${row.image_id}`}
@@ -274,7 +307,7 @@ function History() {
             </div>
           )}
 
-          <p className="mt-4 text-sm text-slate-600">
+          <p className="mt-4 text-sm text-muted">
             Certainty is model confidence, not accuracy. Always use your clinical judgement.
           </p>
         </>

@@ -14,14 +14,13 @@ async function parseError(response) {
     const data = await response.json()
     detail = data.detail
   } catch {
-
+    // The response was not JSON. Fall through to the default message.
   }
-    if (typeof detail === 'string') return { message: detail, detail }
-    if (Array.isArray(detail)) return { message: detail.map((d) => d.msg).join(' '), detail }
-    if (detail && typeof detail.message === 'string') return { message: detail.message, detail }
-    return { message: 'Something went wrong. Please try again.', detail }      // The response was not JSON. Fall through to the default message.
-  }
-  
+  if (typeof detail === 'string') return { message: detail, detail }
+  if (Array.isArray(detail)) return { message: detail.map((d) => d.msg).join(' '), detail }
+  if (detail && typeof detail.message === 'string') return { message: detail.message, detail }
+  return { message: 'Something went wrong. Please try again.', detail }
+}
 
 export async function apiRequest(path, { method = 'GET', token, body, form, formData } = {}) {
   const headers = {}
@@ -46,20 +45,21 @@ export async function apiRequest(path, { method = 'GET', token, body, form, form
   }
 
   if (!response.ok) {
-    const { message, detail } =await parseError(response)
+    const { message, detail } = await parseError(response)
     throw new ApiError(message, response.status, detail)
   }
+  if (response.status === 204) return null
   return response.json()
 }
 
-export async function apiBlob(path, {token, signal} = {}) {
+export async function apiBlob(path, { token, signal } = {}) {
   const headers = {}
   if (token) headers.Authorization = `Bearer ${token}`
 
   let response
   try {
     response = await fetch(`${API_URL}${path}`, { headers, signal })
-  } catch {
+  } catch (error) {
     if (error.name === 'AbortError') throw error
     throw new ApiError('Unable to reach the server. Check your connection and try again.', 0)
   }

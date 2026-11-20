@@ -12,9 +12,9 @@ function NotFound() {
                 404
             </p>
             <section className={`${cardClass} mt-4`}>
-                <Compass aria-hidden="true" className="mx-auto h-6 w-6 text-teal-700" />
-                <h1 className="mt-3 text-xl font-bold text-slate-800">Page not found</h1>
-                <p className="mt-2 text-slate-600">
+                <Compass aria-hidden="true" className="mx-auto h-6 w-6 text-accent" />
+                <h1 className="mt-3 text-xl font-bold text-ink">Page not found</h1>
+                <p className="mt-2 text-muted">
                     The page you are looking for does not exist.
                     {clinician ? 'Return to your image workspace.' : ''}
                 </p>

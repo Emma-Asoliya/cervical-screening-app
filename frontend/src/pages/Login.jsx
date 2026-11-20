@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { LoaderCircle } from 'lucide-react'
 import Alert from '../components/Alert'
+import AuthShell from '../components/AuthShell'
 import PasswordInput from '../components/PasswordInput'
 import TextField from '../components/TextField'
+import { cardClass, eyebrow, primaryButton } from '../components/ui'
 import { useAuth } from '../auth/AuthContext'
-
 
 function Login() {
   const { login, clinician } = useAuth()
@@ -28,28 +29,28 @@ function Login() {
       await login(email.trim(), password)
       navigate(destination, { replace: true })
     } catch (err) {
+      if (err.status === 403 && err.message === 'email_not_verified') {
+        navigate('/verify', {
+          state: { email: email.trim(), notice: 'Confirm your email address to continue.' },
+        })
+        return
+      }
       setError(err.message)
     } finally {
       setSubmitting(false)
     }
   }
-  if(clinician) return <Navigate to={destination} replace />
+  if (clinician) return <Navigate to={destination} replace />
 
   return (
-    <div className="mx-auto max-w-md">
-      <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
-        Clinician workspace
-      </p>
-      <h1 className="text-2xl font-bold text-teal-700">Log in</h1>
-      <p className="mt-1 text-slate-600">Access your image screening workspace.</p>
+    <AuthShell>
+      <p className={eyebrow}>Clinician workspace</p>
+      <h1 className="mt-1 text-3xl font-bold">Log in</h1>
+      <p className="mt-1 text-muted">Access your image screening workspace.</p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="mt-6 space-y-4 rounded-xl border border-teal-100 bg-white p-6 shadow-sm"
-      >
+      <form onSubmit={handleSubmit} className={`${cardClass} mt-6 space-y-4`}>
         {notice && <Alert variant="info" title={notice} />}
         {error && <Alert variant="error" title={error} />}
-
 
         <TextField
           id="email"
@@ -72,32 +73,28 @@ function Login() {
         />
 
         {submitting && (
-          <p role="status" className="flex items-center gap-2 text-sm font-medium text-teal-700">
+          <p role="status" className="flex items-center gap-2 text-sm font-medium text-accent">
             <LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin motion-reduce:animate-none" />
             Logging in…
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-teal-700 px-4 py-2 font-medium text-white hover:bg-teal-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-600"
-        >
+        <button type="submit" disabled={submitting} className={`${primaryButton} w-full`}>
           {submitting ? 'Logging in…' : 'Log in'}
         </button>
 
-        <p className="text-center text-sm text-slate-600">
+        <p className="text-center text-sm text-muted">
           No account yet?{' '}
-          <Link to="/signup" className="font-medium text-teal-700 underline">
+          <Link to="/signup" className="font-medium text-accent underline">
             Sign up
           </Link>
         </p>
       </form>
 
-      <p className="mt-4 text-xs text-slate-600">
+      <p className="mt-4 text-xs text-muted">
         Image decision support only. This is not a patient records system.
       </p>
-    </div>
+    </AuthShell>
   )
 }
 
