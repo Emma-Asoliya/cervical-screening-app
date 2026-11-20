@@ -128,7 +128,7 @@ test.describe('uploading an image (frontend, API, model and database together)',
     await expect(page.getByRole('heading', { name: 'Screening support result' })).toBeVisible()
     await expect(page.getByText(/^(High|Medium|Low) certainty$/)).toBeVisible()
     await expect(page.getByText(/% model confidence/)).toBeVisible()
-    await expect(page.getByText(/not validated for clinical use/)).toBeVisible()
+    await expect(page.getByText(/Decision support only\. Not a diagnosis/).first()).toBeVisible()
     const heatmap = page.getByAltText(/heatmap overlay/)
     await expect(heatmap).toBeVisible()
     // the picture really loaded (not a broken image)

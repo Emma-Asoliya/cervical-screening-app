@@ -135,3 +135,21 @@ def test_original_file_name_is_never_stored_or_returned(client, tmp_path):
     stored = [p.name for p in (tmp_path / "storage").rglob("*") if p.is_file()]
     assert stored
     assert all("Mary" not in name for name in stored)
+
+
+def test_delete_removes_the_image_and_its_files(client, tmp_path):
+    headers = login_headers(client)
+    created = upload(client, headers, make_jpeg())
+    image_id = created.json()["image_id"]
+    assert client.delete(f"/images/{image_id}", headers=headers).status_code == 204
+    assert client.get(f"/images/{image_id}", headers=headers).status_code == 404
+    assert client.get(f"/images/{image_id}/file", headers=headers).status_code == 404
+    assert not list((tmp_path / "storage").rglob("*.jp*g"))
+
+
+def test_cannot_delete_another_clinicians_image(client):
+    owner = login_headers(client, "own@example.com")
+    other = login_headers(client, "oth@example.com")
+    image_id = upload(client, owner, make_jpeg()).json()["image_id"]
+    assert client.delete(f"/images/{image_id}", headers=other).status_code == 404
+    assert client.get(f"/images/{image_id}", headers=owner).status_code == 200

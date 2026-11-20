@@ -40,5 +40,18 @@ class Settings(BaseSettings):
     # Folder holding fold0.keras ... fold4.keras and config.json from the notebook.
     model_dir: Path = Path(__file__).resolve().parent / "ml_models"
 
+    
+    require_email_verification: bool = True
+    verification_code_minutes: int = 15
+    verification_max_attempts: int = 5
+    verification_resend_seconds: int = 60
+    frontend_url: str = "http://localhost:5173"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
+    smtp_use_tls: bool = True
 
+    
 settings = Settings()

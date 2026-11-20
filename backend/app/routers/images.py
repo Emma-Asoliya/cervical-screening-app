@@ -206,3 +206,18 @@ def get_heatmap_file(
     image = _get_owned(db, image_id, current.clinician_id)
     suffix = Path(image.result.heatmap_path).suffix.lower()
     return _file_response(image.result.heatmap_path, MEDIA_TYPES.get(suffix, "image/jpeg"))
+
+
+
+@router.delete("/{image_id}", status_code=204)
+def delete_image(
+    image_id: int,
+    db: Session = Depends(get_db),
+    current: Clinician = Depends(get_current_clinician),
+):
+    """Remove one of the clinician's images, its result, and both stored files."""
+    image = _get_owned(db, image_id, current.clinician_id)
+    paths = [image.file_path, image.result.heatmap_path]
+    db.delete(image)
+    db.commit()
+    _cleanup(paths)

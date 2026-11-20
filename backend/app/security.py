@@ -15,6 +15,13 @@ def verify_password(password: str, password_hash: str) -> bool:
         return False
     return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
 
+_DUMMY_HASH = bcrypt.hashpw(b"not-a-real-password", bcrypt.gensalt()).decode("utf-8")
+
+
+def burn_password_check() -> None:
+    """Do the same work as a real password check, for logins with an unknown email."""
+    bcrypt.checkpw(b"x", _DUMMY_HASH.encode("utf-8"))
+
 def create_access_token(clinician_id: int) -> str:
     """Make a signed token that says who the user is and when it expires."""
     expires = datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_minutes)

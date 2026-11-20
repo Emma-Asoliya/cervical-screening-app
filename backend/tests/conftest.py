@@ -2,6 +2,7 @@ import os
 
 os.environ.setdefault("SECRET_KEY", "test-secret-key-not-for-real-use")
 os.environ["DATABASE_URL"] = "sqlite://"
+os.environ["REQUIRE_EMAIL_VERIFICATION"] = "false"
 
 import pytest
 from fastapi.testclient import TestClient

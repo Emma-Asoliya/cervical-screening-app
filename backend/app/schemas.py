@@ -26,6 +26,23 @@ class ClinicianOut(BaseModel):
     full_name: str
     email: EmailStr
     created_at: datetime
+    email_verified: bool = False
+
+class VerifyRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
+
+
+class ResendRequest(BaseModel):
+    email: EmailStr
+
+
+class MessageResponse(BaseModel):
+    message: str
+
+class VerifyResponse(MessageResponse):
+    access_token: str | None = None
+    token_type: str = "bearer"
 
 class ImageResult(BaseModel):
     image_id: int
