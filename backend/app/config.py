@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     verification_max_attempts: int = 5
     verification_resend_seconds: int = 60
     frontend_url: str = "http://localhost:5173"
+    # Brevo HTTP API (used when brevo_api_key is set; works on hosts that block SMTP).
+    brevo_api_key: str = ""
+    brevo_sender_email: str = ""
+    brevo_sender_name: str = "Cervical Screening Support"
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_username: str = ""
