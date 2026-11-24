@@ -1,7 +1,10 @@
-import secrets 
+import os
+import secrets
 from pathlib import Path
 
-STORAGE_DIR = Path(__file__).resolve().parent.parent / "storage"
+STORAGE_DIR = Path(
+    os.environ.get("STORAGE_DIR", Path(__file__).resolve().parent.parent / "storage")
+)
 
 def new_file_path(folder: str, extension: str) -> tuple[str, Path]:
     name = f"{secrets.token_hex(16)}{extension}"
